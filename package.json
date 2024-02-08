@@ -1,0 +1,17 @@
+{
+  "name": "ens-ssr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js && echo 'const main = __webpack_exports__.main;' >> dist/bundle.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "ethers": "^6.10.0",
+    "snowpack": "^3.8.8",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
