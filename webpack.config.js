@@ -6,14 +6,24 @@ const fetch = require('node-fetch');
 const out = path.resolve(__dirname, 'dist');
 const filename = 'bundle.js';
 
-class DoneHook {
-  constructor(cb) {
-    this.apply = function(compiler) {
-      if (compiler.hooks && compiler.hooks.done) {
-        compiler.hooks.done.tap('done-hook', cb);
-      }
-    };
-  }
+class PreviewViaLocalNode {
+  apply(compiler) {
+    if (compiler.hooks && compiler.hooks.done) {
+      compiler.hooks.done.tap('run-on-done', () => {
+        const hash = execSync(`lightning-node dev store ${out}/${filename}`).toString().split('\t')[0];
+        console.log('Bundle Hash: ' + hash);
+        const addr = `http://localhost:4220/services/1/blake3/${hash}`;
+        fetch(addr).then((res) => {
+          res.text().then((text) => {
+            console.log(`\nGET ${addr}`);
+            console.log(`\n---------\n`);
+            console.log(text);
+            console.log(`\n---------\n`);
+          })
+        });
+      });
+    }
+  };
 }
 
 module.exports = (env) => {
@@ -21,26 +31,17 @@ module.exports = (env) => {
     entry: './src/index.js',
     mode: "none",
     output: {
+      clean: true,
       path: out,
       filename,
       publicPath: '',
       iife: false,
+      // Hack to bind the main function to the global scope
+      library: { type: 'window' },
     },
-    plugins: [
-      new DoneHook(() => {
-        // Hack to expose the main function to the global scope
-        fs.appendFileSync(out + '/' + filename, "const main = __webpack_exports__.main;")
-        if (env.WEBPACK_WATCH) {
-          const hash = execSync(`lightning-node dev store ${out}/${filename}`).toString().split('\t')[0];
-          console.log('Bundle Hash: ' + hash);
-
-          fetch(`http://localhost:4220/services/1/blake3/${hash}`).then((res) => {
-            res.text().then((text) => {
-              console.log('---------\n\n' + text + '\n\n---------');
-            })
-          });
-        }
-      }),
-    ]
+    plugins: [env.WEBPACK_WATCH ? new PreviewViaLocalNode() : null],
+    optimization: {
+      usedExports: true,
+    },
   }
 };
