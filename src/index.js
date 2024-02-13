@@ -1,25 +1,9 @@
-import { ethers } from 'ethers';
+import { Web3Eth } from 'web3-eth';
 
-export const main = async (id = "ozwaldorf.eth") => {
-  const provider = new ethers.JsonRpcProvider('https://cloudflare-eth.com/');
-  const resolver = await provider.getResolver(id);
+BigInt.prototype.toJSON = function() { return this.toString() }
 
-  const address = await resolver.getAddress();
-  const avatar = await resolver.getAvatar();
-  const email = await resolver.getText("email");
-  const url = await resolver.getText("url");
-  const twitter = await resolver.getText("com.twitter");
-
-  return `
-<html>
-  <body>
-    <h1>${id} - ${address}</h1>
-    <image src="${avatar.url}" />
-    <p>Email: ${email}</p>
-    <p><a href="${url}">Homepage</a></p>
-    <p><a href="${twitter}">Twitter</a></p>
-  </body>
-</html>
-`;
+export async function main(name = "ens.eth") {
+  let eth = new Web3Eth('https://cloudflare-eth.com');
+  const block = await eth.getBlock(0);
+  return JSON.stringify(block);
 };
-
