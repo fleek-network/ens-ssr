@@ -6,9 +6,12 @@
 # Install deps
 npm i
 
-# Watch and compile source
+# Watch source, compiling and running the call, printing the result.
 npm run dev
 
-# Push and call the bundled source from a local fleek network node
+# Build source bundle. Output in dist/bundle.js
+npm run build
+
+# Manually push and call the bundled source from a local fleek network node
 curl localhost:4220/services/1/blake3/$(lightning-node dev store $(realpath dist/bundle.js) | awk '{print $1}')
 ```
