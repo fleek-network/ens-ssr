@@ -242,12 +242,7 @@ export const main = async (name = "ens.eth") => {
             var button = document.getElementById('go');
         button.addEventListener('click', goToNewPage);
         });
-            document.addEventListener('DOMContentLoaded', function () {
-            // Wait for the DOM to be fully loaded before trying to attach the event listener
-            var button = document.getElementById('share');
-        button.addEventListener('click', () => navigator.clipboard.writeText(window.location.href);
-        );
-        });
+            
 
         function copyAdd(){
         navigator.clipboard.writeText(${ans.address});
