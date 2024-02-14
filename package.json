@@ -17,6 +17,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "web3": "^4.5.0"
+    "web3": "^4.5.0",
+    "web3-eth": "^4.4.0",
+    "web3-eth-ens": "^4.0.8"
   }
 }

@@ -1,12 +1,31 @@
 import { Web3 } from "web3";
+import { Web3Eth } from "web3-eth";
+import { ENS } from "web3-eth-ens";
+import { fromWei } from "web3-utils";
 import { namehash } from "./utils.js";
 
-const web3 = new Web3("https://cloudflare-eth.com");
+const eth = new Web3Eth("https://cloudflare-eth.com");
+const ens = new ENS(undefined, eth.provider);
 
 export const main = async (name = "ens.eth") => {
-  const resolver = await web3.eth.ens.getResolver(name);
+
+  // const name = location.pathname.substring(1).split("/")[0] || "ens.eth";
+
+  // Get the resolver contract for the name
+  const resolver = await ens.getResolver(name);
+  // const resolver = await web3.eth.ens.getResolver(name);
+
   const hash = namehash(name);
-  const eth_address = await resolver.methods.addr(hash, 60).call(); // 60 = ETH
+  const [[eth_address, eth_balance], github, twitter, avatar, desc] = await Promise.all([
+    resolver.methods.addr(hash, 60).call().then(async(address)=>{
+        const balance = fromWei(await eth.getBalance(address), "ether");
+        return[address, balance]
+    }), 
+    resolver.methods.text(hash, "com.github").call(),
+    resolver.methods.text(hash, "com.twitter").call(),
+    resolver.methods.text(hash, "avatar").call(),
+    resolver.methods.text(hash, "description").call()
+  ])
 
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -50,14 +69,15 @@ export const main = async (name = "ens.eth") => {
     body: raw0,
     redirect: "follow",
   };
+// TODO: Batch these contract calls
 
   // TODO: Batch these contract calls
-  const github = await resolver.methods.text(hash, "com.github").call();
-  const twitter = await resolver.methods.text(hash, "com.twitter").call();
-  const desc = await resolver.methods.text(hash, "description").call();
-  const avatar = await resolver.methods.text(hash, "avatar").call();
+  // const github = await resolver.methods.text(hash, "com.github").call();
+  // const twitter = await resolver.methods.text(hash, "com.twitter").call();
+  // const desc = await resolver.methods.text(hash, "description").call();
+  // const avatar = await resolver.methods.text(hash, "avatar").call();
 
-  const eth_balance = await web3.eth.getBalance(eth_address);
+  // const eth_balance = await web3.eth.getBalance(eth_address);
   // eth_balance = eth_balance/10**18
 
   //   return `<html>
@@ -99,16 +119,26 @@ export const main = async (name = "ens.eth") => {
   finalans = finalans + " " + newans.balance;
   const useableBalance = newans.balance.slice(0, 6);
 
-  var newtokens = await fetch(
-    "https://docs-demo.quiknode.pro/",
-    requestOptions0
-  );
-  var newtokensans = await newtokens.json();
+  
+  // var newtokensans = await newtokens.json();
+  // var newnftans = await newnfts.json();
+  var newnftans;
+  var newtokensans;
+  const [newtokens, newnfts] = await Promise.all([
+    fetch(
+      "https://docs-demo.quiknode.pro/",
+      requestOptions0
+    ).then(async(res)=>{newtokensans = await res.json();}),
+    fetch("https://docs-demo.quiknode.pro/", requestOptions).then(async(res)=>{newnftans = await res.json();})
+  ])
+  // var newtokens = await fetch(
+  //   "https://docs-demo.quiknode.pro/",
+  //   requestOptions0
+  // );
   console.log(newtokensans);
   finalans = finalans + " " + JSON.stringify(newtokensans);
 
-  var newnfts = await fetch("https://docs-demo.quiknode.pro/", requestOptions);
-  var newnftans = await newnfts.json();
+  // var newnfts = await fetch("https://docs-demo.quiknode.pro/", requestOptions);
   console.log(newnftans.result);
 
   var baseUrl =
@@ -276,7 +306,7 @@ export const main = async (name = "ens.eth") => {
             <div class="border-b border-[#5C5C5C] flex justify-between">
                 <div class="text-center flex flex-col gap-4 ">
                     <div class="flex ">
-                        <img class="w-36 border border-yellow-300 h-36 " src="${avatar}" alt="Fleek Network" srcset="">
+                        <img class="w-36 border border-yellow-300 h-36 " src="${avatar ? avatar : "https://media.istockphoto.com/id/1055079680/vector/black-linear-photo-camera-like-no-image-available.jpg?s=612x612&w=0&k=20&c=P1DebpeMIAtXj_ZbVsKVvg-duuL0v9DlrOZUvPG6UJk="}" alt="Fleek Network" srcset="">
                     </div>
                     <div class="flex flex-col text-start gap-1.5">
                         <h1 class="font-semibold text-2xl">${name}</h1>
@@ -286,7 +316,7 @@ export const main = async (name = "ens.eth") => {
                             </button>
                             
                         </div>
-                        <h6 class="pb-5 text-start" id="balance"><span class="text-base mr-1">${eth_balance}</span>wei</h6>                                
+                        <h6 class="pb-5 text-start" id="balance"><span class="text-base mr-1">${eth_balance}</span>Eth</h6>                                
                     </div>                
                 </div>
                 <div class=" w-full basis-1/4">
@@ -296,19 +326,26 @@ export const main = async (name = "ens.eth") => {
             
             <div class=" pt-5">
                 <div>
-                    <h2 class="font-semibold text-2xl">Info</h2>                    
+                    <h2 class="font-semibold text-2xl">Info</h2>    
+                    ${desc ? `
                     <div id="test1" class="border border-[#5C5C5C] px-2.5 py-4 mt-3">
                         <h3 class="text-[#B6B6B6] text-sm">Bio</h3>
                         <h2 class="text-lg">${desc}</h2>
-                    </div>
+                    </div>                    
+                    ` : ""}    
+                    
+                    ${twitter ? `
                     <div id="test1" class="border border-[#5C5C5C] px-2.5 py-4 mt-3">
                         <h3 class="text-[#B6B6B6] text-sm">Twitter</h3>
                         <h2 class="text-lg">@${twitter}</h2>
-                    </div>
+                    </div>                    
+                    `: ""}
+                    ${github ? `
                     <div id="test1" class="border border-[#5C5C5C] px-2.5 py-4 mt-3">
                         <h3 class="text-[#B6B6B6] text-sm">Github</h3>
                         <h2 class="text-lg">@${github}</h2>
-                    </div>
+                    </div>                    
+                    ` : ""}
                     
                     
                 </div>
