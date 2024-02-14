@@ -159,7 +159,7 @@ export const main = async (name = "ens.eth") => {
                                         
                                         
                                         <div class="gap-1 flex flex-col">
-                                            <div class="text-white mt-5"> ${item.totalBalance}</div>                
+                                            <div class="text-white mt-5"> ${fromWei(item.totalBalance, "ether")}</div>                
                                             <div class=" text-sm text-[#B6B6B6]"> ${item.name}</div>                
                                         </div>
                                     </div>
@@ -238,6 +238,12 @@ export const main = async (name = "ens.eth") => {
             // Wait for the DOM to be fully loaded before trying to attach the event listener
             var button = document.getElementById('go');
         button.addEventListener('click', goToNewPage);
+        });
+            document.addEventListener('DOMContentLoaded', function () {
+            // Wait for the DOM to be fully loaded before trying to attach the event listener
+            var button = document.getElementById('share');
+        button.addEventListener('click', () => navigator.clipboard.writeText(window.location.href);
+        );
         });
 
         function copyAdd(){
@@ -320,7 +326,7 @@ export const main = async (name = "ens.eth") => {
                     </div>                
                 </div>
                 <div class=" w-full basis-1/4">
-                    <button class="text-2xl text-black bg-white tracking-widest  w-full px-5 py-3 myBtn">SHARE</button>
+                    <button id="share" class="text-2xl text-black bg-white tracking-widest  w-full px-5 py-3 myBtn">SHARE</button>
                 </div>
             </div>
             
