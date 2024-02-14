@@ -6,7 +6,10 @@ import { namehash } from "./utils.js";
 const eth = new Web3Eth("https://cloudflare-eth.com");
 const ens = new ENS(undefined, "https://cloudflare-eth.com");
 
-export const main = async (name = "ens.eth") => {
+export const main = async () => {
+  // Parse the ens name from the request path `/:name/*`
+  const name = location.pathname.substring(1).split("/")[0] || "ens.eth";
+
   // Get the resolver contract for the name
   const resolver = await ens.getResolver(name);
   const hash = namehash(name);
