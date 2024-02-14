@@ -1,7 +1,9 @@
 {
-  "name": "ens-ssr",
+  "name": "fleek-network-ens-ssr",
+  "author": "Fleek Network <admin@fleek.network>",
   "version": "1.0.0",
-  "description": "",
+  "description": "Fleek Network ENS SSR demo",
+  "license": "MIT",
   "main": "./src/index.js",
   "sideEffects": [
     "./src/index.js"
@@ -10,13 +12,13 @@
     "build": "webpack --config webpack.config.js",
     "dev": "webpack --config webpack.config.js --watch"
   },
-  "author": "",
-  "license": "MIT",
+
   "devDependencies": {
     "webpack": "^5.90.1",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "web3": "^4.5.0"
+    "web3-eth": "^4.4.0",
+    "web3-eth-ens": "^4.0.8"
   }
 }
