@@ -4,7 +4,7 @@ import { fromWei } from "web3-utils";
 import { namehash } from "./utils.js";
 
 const eth = new Web3Eth("https://cloudflare-eth.com");
-const ens = new ENS(undefined, "https://cloudflare-eth.com");
+const ens = new ENS(undefined, eth.provider);
 
 export const main = async () => {
   // Parse the ens name from the request path `/:name/*`
