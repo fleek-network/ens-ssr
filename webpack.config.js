@@ -1,5 +1,4 @@
 const path = require('path');
-const fs = require('fs');
 const { execSync } = require('child_process');
 const fetch = require('node-fetch');
 

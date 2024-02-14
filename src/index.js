@@ -1,4 +1,6 @@
+
 import { Web3 } from "web3";
+
 import { Web3Eth } from "web3-eth";
 import { ENS } from "web3-eth-ens";
 import { fromWei } from "web3-utils";
@@ -6,6 +8,7 @@ import { namehash } from "./utils.js";
 
 const eth = new Web3Eth("https://cloudflare-eth.com");
 const ens = new ENS(undefined, eth.provider);
+
 
 export const main = async (name = "ens.eth") => {
 
@@ -387,6 +390,8 @@ export const main = async (name = "ens.eth") => {
         }
     console.log(2)
     </script>
+
+
   </body>
 </html>
 
